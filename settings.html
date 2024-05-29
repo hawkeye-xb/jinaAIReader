@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		.toggle-switch {
+			position: relative;
+			width: 60px;
+			height: 30px;
+			margin: 0 8px;
+		}
+
+		.toggle-switch input[type="checkbox"] {
+			display: none;
+		}
+
+		.toggle-switch .toggle-switch-label {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: #ccc;
+			border-radius: 15px;
+			cursor: pointer;
+			transition: background-color 0.2s ease-in-out;
+		}
+
+		.toggle-switch .toggle-switch-label:before {
+			content: "";
+			position: absolute;
+			top: 2px;
+			left: 2px;
+			width: 26px;
+			height: 26px;
+			background-color: #fff;
+			border-radius: 50%;
+			transition: transform 0.2s ease-in-out;
+		}
+
+		.toggle-switch input[type="checkbox"]:checked + .toggle-switch-label {
+			background-color: #4caf50;
+		}
+
+		.toggle-switch input[type="checkbox"]:checked + .toggle-switch-label:before {
+			transform: translateX(30px);
+		}
+
+		.toggle-item {display: flex; justify-content: center; align-items: center; margin: 4px;}
+	</style>
+</head>
+<body>
+	Settings
+	<div>https://jina.ai/reader/#apiform</div>
+
+	<br />
+	<div class="toggle-item">
+		<div>
+			Image Caption: 
+		</div>
+		<div class="toggle-switch">
+			<input type="checkbox" id="imageCaption" class="toggle-switch-checkbox">
+			<label for="imageCaption" class="toggle-switch-label"></label>
+		</div>
+	</div>
+	
+	<div class="toggle-item">
+		<div>
+			Gather All Links At the End: 
+		</div>
+		<div class="toggle-switch">
+			<input type="checkbox" id="gatherAllLinksAttheEnd" class="toggle-switch-checkbox">
+			<label for="gatherAllLinksAttheEnd" class="toggle-switch-label"></label>
+		</div>
+	</div>
+	
+	<div class="toggle-item">
+		<div>
+			Gather All Images At the End: 
+		</div>
+		<div class="toggle-switch">
+			<input type="checkbox" id="gatherAllImagesAttheEnd" class="toggle-switch-checkbox">
+			<label for="gatherAllImagesAttheEnd" class="toggle-switch-label"></label>
+		</div>
+	</div>
+
+	<div class="toggle-item">
+		<div>
+			JSON Response: 
+		</div>
+		<div class="toggle-switch">
+			<input type="checkbox" id="JSONResponse" class="toggle-switch-checkbox">
+			<label for="JSONResponse" class="toggle-switch-label"></label>
+		</div>
+	</div>
+
+	<div class="toggle-item">
+		<div style="margin-right: 4px;">Level of Details:</div>
+		<select id="levelOfDetails">
+			<option>Default</option>
+			<option>Markdown</option>
+			<option>HTML</option>
+			<option>Text</option>
+			<option>Screenshot</option>
+		</select>
+	</div>
+
+	<script src="settings.js"></script>
+</body>
+</html>
