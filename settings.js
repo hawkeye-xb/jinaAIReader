@@ -33,9 +33,10 @@ async function getStorage(name) {
 	});
 }
 
-async function setStorage(obj) {
+async function setStorage(obj, callback) {
 	chrome.storage.sync.set(obj, function() {
 		console.log(obj, `setted`);
+		if (callback) callback();
 	});
 }
 
@@ -52,6 +53,51 @@ async function initLevelOfDetails() {
 		var selectedLevelOfDetails = event.target.value;
 		console.info('selectedLevelOfDetails: ', selectedLevelOfDetails);
 		// localStorage.setItem('levelOfDetails', selectedLevelOfDetails);
-		setStorage({'levelOfDetails': selectedLevelOfDetails});
+		setStorage(
+			{'levelOfDetails': selectedLevelOfDetails},
+			() => {
+				setHeaders({
+					"X-Return-Format": selectedLevelOfDetails.toLowerCase(),
+				})
+			},
+		);
 	});
+}
+
+async function setHeaders(obj) {
+  const allResourceTypes = Object.values(chrome.declarativeNetRequest.ResourceType);
+  const MY_CUSTOM_RULE_ID = 1
+
+  chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: [MY_CUSTOM_RULE_ID],
+    addRules: [
+      {
+        id: MY_CUSTOM_RULE_ID,
+        priority: 1,
+        action: {
+          type: "modifyHeaders",
+          requestHeaders: Object.keys(obj).map(el => {
+            const value = obj[el];
+            return {
+              operation: "set",
+              header: el,
+              value,
+            }
+          })
+          // requestHeaders: [
+          //   {
+          //     operation: "set",
+          //     header: "X-Return-Format",
+          //     value: "screenshot"
+          //   },
+          // ]
+        },
+        condition: {
+          urlFilter: "r.jina.ai",
+          resourceTypes: allResourceTypes
+        },
+      }
+    ],
+  });
+
 }

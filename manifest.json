@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Jina AI Reader",
   "description": "Base Level Extension",
-  "version": "0.0.42",
+  "version": "0.0.43",
   "action": {
     "default_popup": "index.html",
     "default_icon": "hello_extensions.png"
