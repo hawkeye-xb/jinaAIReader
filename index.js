@@ -1,35 +1,28 @@
 document.querySelector('#resHTML').addEventListener('click', () => {
 	try {
-		const mth = 'chrome-error://';
-		console.info('location.href', location.href);
-		if (location.href.match(mth)) {
-			console.info('chrome error page, auto redirect');
-			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-				console.info(tabs[0].url);
-				chrome.tabs.update(
-					currentTab.id,
-					{
-						url: `https://jina-redirect-file.vercel.app/?targetURL=${encodeURIComponent(tabs[0].url)}`
-					}
-				);
-			});
-
-			return;
-		}
-
 		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-			console.info(tabs[0].url);
-	
-			chrome.scripting.executeScript({
-				target: {tabId: tabs[0].id},
-				function: () => {
-					generateIframe(tabs[0].url);
+			console.info('current tab url is:', tabs[0].url);
+			chrome.tabs.update(
+				tabs[0].id,
+				{
+					url: `https://hawkeye-jina-redirect-file.deno.dev/?targetURL=${encodeURIComponent(tabs[0].url)}`
 				}
-			}, function(results) {
-				// 这里的results是一个数组，包含了每个执行环境的执行结果
-				console.log('code res:', results);
-			});
+			);
 		});
+
+		// chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		// 	console.info(tabs[0].url);
+	
+		// 	chrome.scripting.executeScript({
+		// 		target: {tabId: tabs[0].id},
+		// 		function: () => {
+		// 			generateIframe(tabs[0].url);
+		// 		}
+		// 	}, function(results) {
+		// 		// 这里的results是一个数组，包含了每个执行环境的执行结果
+		// 		console.log('code res:', results);
+		// 	});
+		// });
 	} catch (error) {
 		console.warn('scripting.executeScript 操作error: ', error);
 	}
