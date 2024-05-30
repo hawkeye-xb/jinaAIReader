@@ -119,8 +119,8 @@ async function updateHeaders() {
 		headers['Target-Selector'] = "#img-content";
 	}
 
-	if(res?.levelOfDetails?.toLowerCase() !== 'default') {
-		headers['X-Return-Format'] = res.levelOfDetails.toLowerCase();
+	if(res?.levelOfDetails && res?.levelOfDetails !== undefined && res?.levelOfDetails?.toLowerCase() !== 'default') {
+		headers['X-Return-Format'] = res?.levelOfDetails?.toLowerCase();
 	} else {
 		if (res?.ImageCaption) {
 			headers["X-With-Generated-Alt"] = "true";
