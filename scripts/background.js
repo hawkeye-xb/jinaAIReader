@@ -10,14 +10,45 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
-initLevelOfDetails();
-async function initLevelOfDetails() {
-  const levelOfDetails = await getStorage('levelOfDetails');
-  if (levelOfDetails) {
-    setHeaders({
-      "X-Return-Format": levelOfDetails.toLowerCase(),
-    });
-  }
+const switchNameItems = [
+	'ImageCaption', 'GatherAllLinksAttheEnd', 'GatherAllImagesAttheEnd',
+	'JSONResponse',
+	'BypasstheCache',
+	'TargetSelector',
+	'WaitForSelector'
+];
+updateHeaders();
+async function updateHeaders() {
+	const res = await getStorages(switchNameItems.concat(['levelOfDetails']));
+	console.info('配置信息:', res);
+	const headers = {};
+	if (res?.WaitForSelector) {
+		headers['X-Wait-For-Selector'] = "#content";
+	}
+	if (res?.TargetSelector) {
+		headers['Target-Selector'] = "#img-content";
+	}
+
+	if(res?.levelOfDetails && res?.levelOfDetails?.toLowerCase() !== 'default') {
+		headers['X-Return-Format'] = res.levelOfDetails.toLowerCase();
+	} else {
+		if (res?.ImageCaption) {
+			headers["X-With-Generated-Alt"] = "true";
+		}
+		if (res?.GatherAllLinksAttheEnd) {
+			headers["X-With-Links-Summary"] = "true";
+		}
+		if (res?.GatherAllImagesAttheEnd) {
+			headers["X-With-Images-Summary"] = "true";
+		}
+	}
+
+	if (res?.BypasstheCache) {
+		headers["X-No-Cache"] = "true";
+	}
+
+  console.info(headers, "headers");
+	setHeaders(headers);
 }
 
 async function setHeaders(obj) {
@@ -58,13 +89,13 @@ async function setHeaders(obj) {
 
 }
 
-async function getStorage(name) {
+async function getStorages(names) {
 	return new Promise((resolve, reject) => {
-		chrome.storage.sync.get([name], function(result) {
+		chrome.storage.sync.get(names, function(result) {
 			if (chrome.runtime.lastError) {
 				reject(new Error(chrome.runtime.lastError));
 			} else {
-				resolve(result[name]);
+				resolve(result);
 			}
 		});
 	});

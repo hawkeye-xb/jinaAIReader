@@ -1,11 +1,18 @@
 /*
 JSON Response 互斥 Stream Mode
-'imageCaption', 'gatherAllLinksAttheEnd', 'gatherAllImagesAttheEnd' 只能default
+'ImageCaption', 'GatherAllLinksAttheEnd', 'GatherAllImagesAttheEnd' 只能default
 */ 
-
-init(['imageCaption', 'gatherAllLinksAttheEnd', 'gatherAllImagesAttheEnd', 'JSONResponse']);
-function init(names) {
-	names.forEach(name => {
+const switchNameItems = [
+	'ImageCaption', 'GatherAllLinksAttheEnd', 'GatherAllImagesAttheEnd',
+	'JSONResponse',
+	'BypasstheCache',
+	'TargetSelector',
+	'WaitForSelector'
+];
+init();
+async function init() {
+	await initLevelOfDetails();
+	switchNameItems.forEach(name => {
 		initSwitch(name);
 		initListener(name);
 	});
@@ -36,19 +43,24 @@ async function getStorage(name) {
 	});
 }
 
-async function setStorage(obj, callback) {
-	chrome.storage.sync.set(obj, function() {
-		console.log(obj, `setted`);
-		if (callback) callback();
+async function getStorages(names) {
+	return new Promise((resolve, reject) => {
+		chrome.storage.sync.get(names, function(result) {
+			if (chrome.runtime.lastError) {
+				reject(new Error(chrome.runtime.lastError));
+			} else {
+				resolve(result);
+			}
+		});
 	});
 }
 
-function toggleDisabled(name) {
-	const actionDom = document.getElementById(name);
-	actionDom.disabled = !actionDom.disabled;
+async function setStorage(obj) {
+	chrome.storage.sync.set(obj, function() {
+		console.log(obj, `setted`);
+		updateHeaders();
+	});
 }
-
-initLevelOfDetails();
 
 async function initLevelOfDetails() {
 	const levelOfDetails = await getStorage('levelOfDetails');
@@ -57,7 +69,7 @@ async function initLevelOfDetails() {
 		selectElement.value = levelOfDetails;
 	}
 	
-	initLevelOfDetailsDisabledSwitch('levelOfDetails');
+	initLevelOfDetailsDisabledSwitch(levelOfDetails);
 
 	document.querySelector('#levelOfDetails').addEventListener('change', function(event) {
 		var selectedLevelOfDetails = event.target.value;
@@ -65,24 +77,17 @@ async function initLevelOfDetails() {
 		if (selectedLevelOfDetails.toLowerCase() !== 'default') {
 			headers = {
 				...headers,
-				'imageCaption': false, 'gatherAllLinksAttheEnd': false, 'gatherAllImagesAttheEnd': false,
+				'ImageCaption': false, 'GatherAllLinksAttheEnd': false, 'GatherAllImagesAttheEnd': false,
 			};
 		}
 
-		setStorage(
-			headers,
-			() => {
-				setHeaders({
-					"X-Return-Format": selectedLevelOfDetails.toLowerCase(),
-				});
-				initLevelOfDetailsDisabledSwitch(selectedLevelOfDetails);
-			},
-		);
+		setStorage(headers);
+		initLevelOfDetailsDisabledSwitch(selectedLevelOfDetails);
 	});
 }
 function initLevelOfDetailsDisabledSwitch(selectedLevelOfDetails) {
 	if (selectedLevelOfDetails && selectedLevelOfDetails.toLowerCase() !== 'default') {
-		['imageCaption', 'gatherAllLinksAttheEnd', 'gatherAllImagesAttheEnd'].forEach(name => {
+		['ImageCaption', 'GatherAllLinksAttheEnd', 'GatherAllImagesAttheEnd'].forEach(name => {
 			document.getElementById(name).disabled = true;
 			document.getElementById(name).checked = false;
 
@@ -92,7 +97,7 @@ function initLevelOfDetailsDisabledSwitch(selectedLevelOfDetails) {
 			}
 		});
 	} else {
-		['imageCaption', 'gatherAllLinksAttheEnd', 'gatherAllImagesAttheEnd'].forEach(name => {
+		['ImageCaption', 'GatherAllLinksAttheEnd', 'GatherAllImagesAttheEnd'].forEach(name => {
 			document.getElementById(name).disabled = false;
 
 			var toggleSwitchWithChild = findToggleSwitchWithChildId(name);
@@ -101,6 +106,38 @@ function initLevelOfDetailsDisabledSwitch(selectedLevelOfDetails) {
 			}
 		});
 	}
+}
+
+async function updateHeaders() {
+	const res = await getStorages(switchNameItems.concat(['levelOfDetails']));
+	console.info('配置信息:', res);
+	const headers = {};
+	if (res?.WaitForSelector) {
+		headers['X-Wait-For-Selector'] = "#content";
+	}
+	if (res?.TargetSelector) {
+		headers['Target-Selector'] = "#img-content";
+	}
+
+	if(res?.levelOfDetails?.toLowerCase() !== 'default') {
+		headers['X-Return-Format'] = res.levelOfDetails.toLowerCase();
+	} else {
+		if (res?.ImageCaption) {
+			headers["X-With-Generated-Alt"] = "true";
+		}
+		if (res?.GatherAllLinksAttheEnd) {
+			headers["X-With-Links-Summary"] = "true";
+		}
+		if (res?.GatherAllImagesAttheEnd) {
+			headers["X-With-Images-Summary"] = "true";
+		}
+	}
+
+	if (res?.BypasstheCache) {
+		headers["X-No-Cache"] = "true";
+	}
+
+	setHeaders(headers);
 }
 
 async function setHeaders(obj) {
