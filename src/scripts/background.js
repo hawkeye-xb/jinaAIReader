@@ -47,6 +47,11 @@ async function updateHeaders() {
 		headers["X-No-Cache"] = "true";
 	}
 
+  const cookies = await getStorage('cookies');
+	if (cookies && cookies.length > 0) {
+		headers["X-Set-Cookie"] = cookies.join('; ');
+	}
+
   console.info(headers, "headers");
 	setHeaders(headers);
 }
@@ -97,6 +102,18 @@ async function getStorages(names) {
 				reject(new Error(chrome.runtime.lastError));
 			} else {
 				resolve(result);
+			}
+		});
+	});
+}
+
+async function getStorage(name) {
+	return new Promise((resolve, reject) => {
+		chrome.storage.sync.get([name], function(result) {
+			if (chrome.runtime.lastError) {
+				reject(new Error(chrome.runtime.lastError));
+			} else {
+				resolve(result[name]);
 			}
 		});
 	});

@@ -58,6 +58,23 @@
 		}
 
 		.toggle-item {display: flex; justify-content: center; align-items: center; margin: 4px;}
+
+		form {
+			margin-bottom: 20px;
+		}
+		textarea {
+			width: 100%;
+			height: 200px;
+		}
+		#finalCookieString {
+			margin-top: 20px;
+			padding: 10px;
+			background-color: #f8f8f8;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+		}
 	</style>
 </head>
 <body>
@@ -147,6 +164,34 @@
 
 	<div class="toggle-item"><del>Use a Proxy Server</del></div>
 
+	<!-- form -->
+	<p>Set cookies</p>
+	<form id="cookieForm">
+		<label for="name">Name:</label>
+		<input type="text" id="nameInput" name="name" required>
+		<label for="value">Value:</label>
+		<input type="text" id="valueInput" name="value" required>
+		<label for="domain">Domain:</label>
+		<input type="text" id="domainInput" name="domain">
+		<label for="expires">Expires:</label>
+		<input type="text" id="expiresInput" name="expires">
+		<label for="path">Path:</label>
+		<input type="text" id="pathInput" name="path">
+		<label for="secure">Secure:</label>
+		<input type="checkbox" id="secureInput" name="secure">
+		<label for="httponly">HttpOnly:</label>
+		<input type="checkbox" id="httponlyInput" name="httponly">
+		<button type="submit">Add Cookie</button>
+	</form>
+	
+	<!-- <button id="saveCookies">Save Cookies as HTTP Headers</button> -->
+	
+	<div style="display: flex; justify-content: center; align-items: center; width: 100%; flex-direction: column;">
+		<div id="finalCookieString" style="max-width: 1200px; min-width: 320px;"></div>
+		<button id="clearCookies" style="margin-top: 4px;">clear cookies</button>
+	</div>
+
 	<script src="/scripts/settings.js"></script>
+	<script src="./scripts/setCookies.js"></script>
 </body>
 </html>

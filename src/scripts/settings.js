@@ -137,6 +137,11 @@ async function updateHeaders() {
 		headers["X-No-Cache"] = "true";
 	}
 
+	const cookies = await getStorage('cookies');
+	if (cookies && cookies.length > 0) {
+		headers["X-Set-Cookie"] = cookies.join('; ');
+	}
+
 	setHeaders(headers);
 }
 
