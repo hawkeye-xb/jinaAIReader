@@ -1,0 +1,44 @@
+
+name: zip src files and upload github release
+
+# This workflow is triggered on pushes to the repository.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*-*' # This will match tags like v1.0.0, v0.1.0-beta.1, v0.1.0-alpha.1, etc.
+    
+# on: push    # Default will running for every branch.
+    
+jobs:
+  build:
+    # This job will run on ubuntu virtual machine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Zip Src Dir
+        run: zip -r jinaReader.zip ./src
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTH_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: ${{ contains(github.ref, '-alpha') || contains(github.ref, '-beta') }}
+          body: ${{ github.event.head_commit.message }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./jinaReader.zip
+          asset_name: jinaReader.zip
+          asset_content_type: application/zip
+  
