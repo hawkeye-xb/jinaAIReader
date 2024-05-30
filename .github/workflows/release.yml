@@ -6,7 +6,7 @@ name: zip src files and upload github release
 on:
   push:
     tags:
-      - 'v*.*.*-*' # This will match tags like v1.0.0, v0.1.0-beta.1, v0.1.0-alpha.1, etc.
+      - 'v*.*.*' # This will match tags like v1.0.0, v0.1.0-beta.1, v0.1.0-alpha.1, etc.
     
 # on: push    # Default will running for every branch.
     
