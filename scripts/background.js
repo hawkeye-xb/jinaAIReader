@@ -13,9 +13,11 @@ chrome.runtime.onMessage.addListener(
 initLevelOfDetails();
 async function initLevelOfDetails() {
   const levelOfDetails = await getStorage('levelOfDetails');
-  setHeaders({
-    "X-Return-Format": levelOfDetails.toLowerCase(),
-  });
+  if (levelOfDetails) {
+    setHeaders({
+      "X-Return-Format": levelOfDetails.toLowerCase(),
+    });
+  }
 }
 
 async function setHeaders(obj) {
