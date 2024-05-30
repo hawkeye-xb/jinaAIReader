@@ -52,6 +52,7 @@ async function updateHeaders() {
 }
 
 async function setHeaders(obj) {
+  if (!(Object.keys(obj).length > 0)) return;
   const allResourceTypes = Object.values(chrome.declarativeNetRequest.ResourceType);
   const MY_CUSTOM_RULE_ID = 1
 
@@ -68,7 +69,7 @@ async function setHeaders(obj) {
             return {
               operation: "set",
               header: el,
-              value,
+              value, // value为空的时候呢？
             }
           })
           // requestHeaders: [

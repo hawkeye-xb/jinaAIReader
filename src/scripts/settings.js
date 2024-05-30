@@ -141,6 +141,7 @@ async function updateHeaders() {
 }
 
 async function setHeaders(obj) {
+	if (!(Object.keys(obj).length > 0)) return;
   const allResourceTypes = Object.values(chrome.declarativeNetRequest.ResourceType);
   const MY_CUSTOM_RULE_ID = 1
 
